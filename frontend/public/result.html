@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skin Analysis Result</title>
+<style>
+  body {
+    font-family: Helvetica, Arial, sans-serif;
+    background: linear-gradient(to bottom right, #fdfbfb, #ebedee);
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+  }
+  .result-container {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+    padding: 40px 60px;
+    max-width: 600px;
+    text-align: center;
+  }
+  h1 {
+    margin-top: 0;
+    font-size: 24px;
+    font-weight: 600;
+  }
+  p {
+    font-size: 16px;
+    margin-top: 20px;
+    line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+  <div class="result-container">
+    <h1>Your Skin Analysis</h1>
+    <p id="analysisText">Loading analysis...</p>
+  </div>
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const result = params.get('result');
+  const textElem = document.getElementById('analysisText');
+  if (result) {
+    textElem.textContent = decodeURIComponent(result);
+  } else {
+    textElem.textContent = 'No analysis result available.';
+  }
+</script>
+</body>
+</html>
