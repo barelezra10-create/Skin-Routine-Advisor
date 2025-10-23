@@ -17,52 +17,59 @@ const ImageUploader = () => {
   const handleUpload = async () => {
     if (!image) return;
     setLoading(true);
-    const formData = new FormData();
-    formData.append('file', image);
     try {
-      const res = await fetch('/api/analyze', {
-        method: 'POST',
-        body: formData,
-      });
-      const data = await res.json();
-      setResult(data.result);
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64String = reader.result.split(',')[1];
+        const res = await fetch('/api/analyze', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ image: base64String }),
+        });
+        const data = await res.json();
+        setResult(data.result);
+        setLoading(false);
+      };
+      reader.readAsDataURL(image);
     } catch (err) {
       console.error(err);
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
     <div className="max-w-md mx-auto p-6 bg-white rounded-xl shadow-md text-center">
       <h1 className="text-2xl font-bold mb-2">Upload your skin photo for instant analysis</h1>
-      <p className="text-gray-500 mb-4">Get personalized skincare insights in seconds.</p>
+      <p className="text-gray-600 mb-4">Get personalized skincare insights in seconds.</p>
       <div
-        className="border-2 border-dashed border-gray-300 rounded-lg p-6 cursor-pointer mb-4"
+        className="border-2 border-dashed border-gray-300 rounded-lg p-6 cursor-pointer"
         onClick={() => document.getElementById('fileInput').click()}
       >
         {preview ? (
-          <img src={preview} alt="preview" className="mx-auto w-40 h-40 rounded-lg object-cover" />
+          <img src={preview} alt="Preview" className="w-full h-auto mb-4 rounded-md" />
         ) : (
-          <span className="text-gray-400">Drag & drop or click to select an image</span>
+          <span className="text-gray-500">Drag & drop or click to select an image</span>
         )}
         <input
-          id="fileInput"
           type="file"
+          id="fileInput"
           accept="image/*"
-          onChange={handleFileChange}
           className="hidden"
+          onChange={handleFileChange}
         />
       </div>
       <button
         onClick={handleUpload}
-        className="mt-2 px-6 py-2 text-white rounded-full bg-gradient-to-r from-blue-400 to-blue-500 disabled:opacity-60"
-        disabled={loading || !image}
+        className="mt-4 px-6 py-2 rounded-full bg-gradient-to-r from-blue-400 to-blue-500 text-white font-semibold disabled:opacity-60"
+        disabled={!image || loading}
       >
         {loading ? 'Analyzing...' : 'Analyze Skin'}
       </button>
       {result && (
-        <div className="mt-4 bg-gray-100 p-3 rounded">
-          <h3 className="font-bold mb-2">Result:</h3>
+        <div className="mt-4 p-4 bg-gray-100 rounded-lg text-left">
+          <h2 className="font-bold mb-2">Analysis Result</h2>
           <p>{result}</p>
         </div>
       )}
